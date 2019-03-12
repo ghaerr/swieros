@@ -22,6 +22,7 @@
 
 enum { xCLOSED, xCONSOLE, xFILE, xSOCKET, xDIR };
 int xfd[NOFILE];
+DIR *xfp[NOFILE];
 int xft[NOFILE];
 
 char *pesc = 0;
@@ -29,17 +30,19 @@ char *pesc = 0;
 int xopen(char *fn, int mode)
 {
   int i,d;
+  void *p;
   struct stat hs; int r;
   for (i=0;i<NOFILE;i++) {
     if (xft[i] == xCLOSED) {
       if (!(mode & O_CREAT) && !stat(fn, &hs) && S_ISDIR(hs.st_mode)) {
-        if (!(d = (int)opendir(fn))) return -1;
+        if (!(p = opendir(fn))) return -1;
         xft[i] = xDIR;
+        xfp[i] = p;
       } else {
         if ((d = open(fn, mode, S_IRWXU)) < 0) return d;
         xft[i] = xFILE;
+        xfd[i] = d;
       }
-      xfd[i] = d;
       return i;
     }
   }
@@ -52,9 +55,9 @@ int xclose(int d)
   switch (xft[d]) {
   case xSOCKET: 
   case xFILE: r = close(xfd[d]); break;
-  case xDIR: closedir((DIR*)xfd[d]); r = 0; break;
+  case xDIR: closedir(xfp[d]); r = 0; break;
   }
-  xfd[d] = -1; xft[d] = xCLOSED;
+  xfp[d] = (DIR *)-1; xfd[d] = -1; xft[d] = xCLOSED;
   return r;
 }
 int xread(int d, void *b, int n)
@@ -68,7 +71,7 @@ int xread(int d, void *b, int n)
   case xCONSOLE: return read(0,b,1);
   case xDIR:
     if (n != NAME_MAX) return 0;
-    if (!(de = readdir((DIR*)xfd[d]))) return 0;
+    if (!(de = readdir(xfp[d]))) return 0;
     n = 1; memcpy(b, &n, 4);
     strncpy((char *)b+4, de->d_name, NAME_MAX-4);
     return NAME_MAX; // XXX hardcoded crap
@@ -158,11 +161,19 @@ int xstat(char *file, struct xstat *s)
 }
 void *xsbrk(int i)
 {
-  void *p; static brk = 0;
-  if (!i) return (void *)brk;
-  if (i < 0) { printf("sbrk(i<0) not implemented\n"); exit(-1); }
-  if (p = malloc(i)) { memset(p, 0, i); brk += i; return p; } // XXX memset is probably redundant since we never reallocate
-  return (void *)-1;
+  void *p;
+  static char *base = 0;
+  static uint brk = 0;
+  if (!base) {
+    base = malloc(64*1024*1024);
+	if (!base) { dprintf(2,"can't allocate 64MB\n"); exit(-1); }
+  }
+  if (brk+i > 64*1024*1024) { dprintf(2,"sbrk: out of memory\n"); exit(-1); }
+  if (brk+i < 0) { dprintf(2,"sbrk: invalid negative break\n"); exit(-1); }
+  p = base + brk;
+  if (i > 0) memset(p, 0, i);		// memset required for BSS vars
+  brk += i;
+  return p;
 }
 int xmkdir(char *path)
 {

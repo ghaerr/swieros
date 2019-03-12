@@ -1,0 +1,6 @@
+11 Mar 2019
+	* still needs 64-bit em.c port
+	* alternative bootstrap uses xeu and bin/c to compile c, then c to compile os, mkfs & run mkfs
+	* ported eu.c to 64-bit, uses mem+uint offsets for all pointers
+	* rewrote linux sbrk() to emulate real sbrk from 64MB malloc
+* Original verison from rswier/swieros 12/29/14

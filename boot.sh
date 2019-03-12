@@ -1,5 +1,19 @@
 #!/bin/sh
-rm -f xc xem xmkfs root/bin/c root/etc/os root/etc/sfs.img fs.img
+rm -f xc xem xeu xmkfs root/etc/os root/etc/sfs.img fs.img
+
+# alternative bootstrap uses existing c compiler binary and host compiled eu.c
+gcc -o xeu -O3 -Ilinux -Iroot/lib root/bin/eu.c
+./xeu root/bin/c -Iroot/lib -o root/bin/c root/bin/c.c
+./xeu root/bin/c -Iroot/lib -o root/etc/mkfs root/etc/mkfs.c
+./xeu root/bin/c -Iroot/lib -o root/etc/os root/etc/os.c
+./xeu root/etc/mkfs sfs.img root
+mv sfs.img root/etc
+./xeu root/etc/mkfs fs.img root
+
+#./xem -f fs.img root/etc/os
+exit
+
+# original bootstrap
 gcc -o xc -O3 -m32 -Ilinux -Iroot/lib root/bin/c.c
 gcc -o xem -O3 -m32 -Ilinux -Iroot/lib root/bin/em.c -lm
 gcc -o xmkfs -O3 -m32 -Ilinux -Iroot/lib root/etc/mkfs.c
