@@ -364,7 +364,7 @@ if (verbose) dprintf(2,"%08x  %08x%6.4s\n", pc, ir, &ops[(ir&0xff)*5]);
   }
 }
 
-usage()
+void usage()
 {
   dprintf(2,"%s : usage: %s [-v] file ...\n", cmd, cmd);
   exit(-1);
@@ -376,6 +376,10 @@ int main(int argc, char *argv[])
   struct { uint magic, bss, entry, flags; } hdr;
   char *file;
   struct stat st;
+
+int i;
+  for(i = 0; i < argc; i++)		// debug args and open in OS
+    printf("%s%c", argv[i], (i+1 < argc) ? ' ' : '\n');
 
   cmd = *argv;
   if (argc < 2) usage();
@@ -397,6 +401,7 @@ int main(int argc, char *argv[])
   
   memsz = (uint)st.st_size - sizeof(hdr) + hdr.bss;
   mem = sbrk(memsz + STACKSZ);
+
   if (verbose) dprintf(2, "mem %x-%x, memsz %x, stacksz %x, bss %x, entry %x, flags %x\n", mem, mem+memsz+STACKSZ, memsz, STACKSZ, hdr.bss, hdr.entry, hdr.flags);
   if (read(f, mem, st.st_size - sizeof(hdr)) != (uint)st.st_size - sizeof(hdr)) { dprintf(2,"%s : read error\n"); return -1; }
   close(f);

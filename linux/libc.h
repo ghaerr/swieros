@@ -165,10 +165,10 @@ void *xsbrk(int i)
   static char *base = 0;
   static uint brk = 0;
   if (!base) {
-    base = malloc(64*1024*1024);
+    base = malloc(180*1024*1024);
 	if (!base) { dprintf(2,"can't allocate 64MB\n"); exit(-1); }
   }
-  if (brk+i > 64*1024*1024) { dprintf(2,"sbrk: out of memory\n"); exit(-1); }
+  if (brk+i > 180*1024*1024) { dprintf(2,"sbrk: out of memory\n"); exit(-1); }
   if (brk+i < 0) { dprintf(2,"sbrk: invalid negative break\n"); exit(-1); }
   p = base + brk;
   if (i > 0) memset(p, 0, i);		// memset required for BSS vars

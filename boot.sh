@@ -6,11 +6,18 @@ gcc -o xeu -O3 -Ilinux -Iroot/lib root/bin/eu.c
 ./xeu root/bin/c -Iroot/lib -o root/bin/c root/bin/c.c
 ./xeu root/bin/c -Iroot/lib -o root/etc/mkfs root/etc/mkfs.c
 ./xeu root/bin/c -Iroot/lib -o root/etc/os root/etc/os.c
+
+# other non-needed stuff to put on file system
+./xeu root/bin/c -Iroot/lib -o root/bin/echo root/bin/echo.c
+./xeu root/bin/c -Iroot/lib -o root/bin/eu root/bin/eu.c
+./xeu root/bin/c -Iroot/lib -o root/bin/eu-org root/bin/eu-org.c
+
 ./xeu root/etc/mkfs sfs.img root
 mv sfs.img root/etc
 ./xeu root/etc/mkfs fs.img root
 
-#./xem -f fs.img root/etc/os
+gcc -o xem -O3 -Wno-bitwise-op-parentheses -Wno-parentheses -Ilinux -Iroot/lib root/bin/emsafe.c -lm
+./xem -f fs.img root/etc/os
 exit
 
 # original bootstrap

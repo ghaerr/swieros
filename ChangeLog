@@ -1,6 +1,8 @@
 11 Mar 2019
-	* still needs 64-bit em.c port
+	* eu broken inside OS
+	* added DEL backspace processing to sh
+	* used Rob's emsafe.c 64-bit port and have system running with 180MB requirement in linux/libc.h sbrk()
 	* alternative bootstrap uses xeu and bin/c to compile c, then c to compile os, mkfs & run mkfs
-	* ported eu.c to 64-bit, uses mem+uint offsets for all pointers
+	* ported eu.c to 64-bit, uses mem+uint offsets for all pointers, reboxes argv on 32-bit stack
 	* rewrote linux sbrk() to emulate real sbrk from 64MB malloc
 * Original verison from rswier/swieros 12/29/14
