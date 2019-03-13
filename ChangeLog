@@ -1,3 +1,5 @@
+12 March 2019
+	* add instruction profiler to emsafe.c
 11 Mar 2019
 	* eu broken inside OS
 	* added DEL backspace processing to sh

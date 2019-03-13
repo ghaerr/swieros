@@ -17,7 +17,7 @@ mv sfs.img root/etc
 ./xeu root/etc/mkfs fs.img root
 
 gcc -o xem -O3 -Wno-bitwise-op-parentheses -Wno-parentheses -Ilinux -Iroot/lib root/bin/emsafe.c -lm
-./xem -f fs.img root/etc/os
+./xem -v -f fs.img root/etc/os
 exit
 
 # original bootstrap

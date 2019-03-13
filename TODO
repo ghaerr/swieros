@@ -1,3 +1,13 @@
 eu echo 1 2 3 broken inside OS
+eu echo 1 2 works
 
 cycle count incorrect, check IDLE instruction?
+
+function args always 8, fix to 4 or 8
+calling sequence, bp frame or not
+instruction set names, see com compiler
+	emulator instruction profiler
+
+em -f use mmap for ramfs
+
+why vs v | p in emulator?

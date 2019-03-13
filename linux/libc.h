@@ -169,7 +169,7 @@ void *xsbrk(int i)
 	if (!base) { dprintf(2,"can't allocate 64MB\n"); exit(-1); }
   }
   if (brk+i > 180*1024*1024) { dprintf(2,"sbrk: out of memory\n"); exit(-1); }
-  if (brk+i < 0) { dprintf(2,"sbrk: invalid negative break\n"); exit(-1); }
+  if ((int)brk+i < 0) { dprintf(2,"sbrk: invalid negative break\n"); exit(-1); }
   p = base + brk;
   if (i > 0) memset(p, 0, i);		// memset required for BSS vars
   brk += i;

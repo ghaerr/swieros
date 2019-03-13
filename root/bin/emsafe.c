@@ -63,6 +63,38 @@ ulong pdir, mem;
 
 char *cmd;       // command name
 
+uint inscount[IDLE+1];
+char ops[] = 
+  "HALT,ENT ,LEV ,JMP ,JMPI,JSR ,JSRA,LEA ,LEAG,CYC ,MCPY,MCMP,MCHR,MSET," // system
+  "LL  ,LLS ,LLH ,LLC ,LLB ,LLD ,LLF ,LG  ,LGS ,LGH ,LGC ,LGB ,LGD ,LGF ," // load a
+  "LX  ,LXS ,LXH ,LXC ,LXB ,LXD ,LXF ,LI  ,LHI ,LIF ,"
+  "LBL ,LBLS,LBLH,LBLC,LBLB,LBLD,LBLF,LBG ,LBGS,LBGH,LBGC,LBGB,LBGD,LBGF," // load b
+  "LBX ,LBXS,LBXH,LBXC,LBXB,LBXD,LBXF,LBI ,LBHI,LBIF,LBA ,LBAD,"
+  "SL  ,SLH ,SLB ,SLD ,SLF ,SG  ,SGH ,SGB ,SGD ,SGF ,"                     // store
+  "SX  ,SXH ,SXB ,SXD ,SXF ,"
+  "ADDF,SUBF,MULF,DIVF,"                                                   // arithmetic
+  "ADD ,ADDI,ADDL,SUB ,SUBI,SUBL,MUL ,MULI,MULL,DIV ,DIVI,DIVL,"
+  "DVU ,DVUI,DVUL,MOD ,MODI,MODL,MDU ,MDUI,MDUL,AND ,ANDI,ANDL,"
+  "OR  ,ORI ,ORL ,XOR ,XORI,XORL,SHL ,SHLI,SHLL,SHR ,SHRI,SHRL,"
+  "SRU ,SRUI,SRUL,EQ  ,EQF ,NE  ,NEF ,LT  ,LTU ,LTF ,GE  ,GEU ,GEF ,"      // logical  
+  "BZ  ,BZF ,BNZ ,BNZF,BE  ,BEF ,BNE ,BNEF,BLT ,BLTU,BLTF,BGE ,BGEU,BGEF," // conditional
+  "CID ,CUD ,CDI ,CDU ,"                                                   // conversion
+  "CLI ,STI ,RTI ,BIN ,BOUT,NOP ,SSP ,PSHA,PSHI,PSHF,PSHB,POPB,POPF,POPA," // misc
+  "IVEC,PDIR,SPAG,TIME,LVAD,TRAP,LUSP,SUSP,LCL ,LCA ,PSHC,POPC,MSIZ,"
+  "PSHG,POPG,NET1,NET2,NET3,NET4,NET5,NET6,NET7,NET8,NET9,"
+  "POW ,ATN2,FABS,ATAN,LOG ,LOGT,EXP ,FLOR,CEIL,HYPO,SIN ,COS ,TAN ,ASIN," // math
+  "ACOS,SINH,COSH,TANH,SQRT,FMOD,"
+  "IDLE,";
+
+void
+profiler()
+{
+	int i;
+
+	for (i=0; i<IDLE+1; i++)
+		dprintf(2,"%12d   %6.4s\n", inscount[i], &ops[i*5]);
+} 
+
 void *new(int size)
 {
   void *p;
@@ -185,6 +217,7 @@ void cpu(uint pc, uint sp)
       ppc--;
     }
     ir = *(int *)(pc ^ ppc);
+	if (verbose) inscount[ir&0xff]++;
     pc += 4;
     switch ((uchar)ir) {    
     case HALT: if (user || verbose) dprintf(2,"halt(%d) cycle = %u\n", a, cycle); return; // XXX should be supervisor!
@@ -195,7 +228,7 @@ void cpu(uint pc, uint sp)
         pfd.events = POLLIN;
         if (poll(&pfd, 1, 0) == 1 && read(0, &ch, 1) == 1) {
           kbchar = ch;
-          if (kbchar == '`') { dprintf(2,"ungraceful exit. cycle = %u\n", cycle); return; }
+          if (kbchar == '`') { if (verbose) profiler(); dprintf(2,"ungraceful exit. cycle = %u\n", cycle); return; }
           trap = FKEYBD; 
           iena = 0;
           goto interrupt;
