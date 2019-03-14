@@ -49,7 +49,7 @@ int cpu(uint pc, int argc, char **argv)
   uint av;
 
   sp = (memsz + STACKSZ) & -8;
-  av = sp -= (argc+1)*4 & -8;			// argv
+  av = sp -= ((argc+1)*4+7) & -8;			// argv
   
   // copy arguments to 32-bit stack
   *(uint *)(mem+av + argc*4) = 0;		// NULL
@@ -376,10 +376,6 @@ int main(int argc, char *argv[])
   struct { uint magic, bss, entry, flags; } hdr;
   char *file;
   struct stat st;
-
-int i;
-  for(i = 0; i < argc; i++)		// debug args and open in OS
-    printf("%s%c", argv[i], (i+1 < argc) ? ' ' : '\n');
 
   cmd = *argv;
   if (argc < 2) usage();

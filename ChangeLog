@@ -1,5 +1,7 @@
+13 March 2019
+	* fix eu argv reboxing bug
 12 March 2019
-	* add instruction profiler to emsafe.c
+	* add instruction profiler to emsafe.c, use -v
 11 Mar 2019
 	* eu broken inside OS
 	* added DEL backspace processing to sh
