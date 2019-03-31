@@ -12,6 +12,7 @@
 #include <termios.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <sys/mman.h>
 
 #define NOFILE 16 // XXX subject to change
 

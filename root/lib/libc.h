@@ -6,6 +6,9 @@ enum { O_RDONLY, O_WRONLY, O_RDWR, O_CREAT = 0x100, O_TRUNC = 0x200 };
 enum { SEEK_SET, SEEK_CUR, SEEK_END };
 enum { BUFSIZ = 1024, NAME_MAX = 256, PATH_MAX = 256 }; // XXX
 enum { POLLIN = 1, POLLOUT = 2, POLLNVAL = 4 };
+enum { PROT_NONE, PROT_READ, PROT_WRITE, PROT_EXEC };
+enum { MAP_SHARED = 0x01, MAP_PRIVATE = 0x02, MAP_FILE = 0x00, MAP_FIXED = 0x10 };
+enum { MAP_FAILED = -1 };
 
 struct stat { ushort st_dev; ushort st_mode; uint st_ino; uint st_nlink; uint st_size; };
 struct pollfd { int fd; short events, revents; };
@@ -42,6 +45,8 @@ lseek()  { asm(LL,8); asm(LBL,16); asm(LCL,24); asm(TRAP,S_lseek); }
 mount()  { asm(LL,8); asm(LBL,16); asm(LCL,24); asm(TRAP,S_mount); }
 umount() { asm(LL,8); asm(TRAP,S_umount); }
 poll()   { asm(LL,8); asm(LBL,16); asm(LCL,24); asm(TRAP,S_poll); }
+mmap()   { asm(LL, 8); asm(LBL,16); asm(LCL,24); asm(TRAP,S_save);
+           asm(LL,32); asm(LBL,40); asm(LCL,48); asm(TRAP,S_mmap); }
 
 // string routines
 int strcmp(char *d, char *s) { for (; *d == *s; d++, s++) if (!*d) return 0; return *d - *s; }

@@ -47,6 +47,7 @@ int cpu(uint pc, int argc, char **argv)
   double f, g;
   unsigned char *p;
   uint av;
+  uint x, y, z;
 
   sp = (memsz + STACKSZ) & -8;
   av = sp -= ((argc+1)*4+7) & -8;			// argv
@@ -351,6 +352,9 @@ if (verbose) dprintf(2,"%08x  %08x%6.4s\n", pc, ir, &ops[(ir&0xff)*5]);
       case S_accept:  a = accept(a, (void *)mem+b, (void *)mem+c); continue; // accept(fd, addr, addrlen)
       case S_connect: a = connect(a, (void *)mem+b, c);            continue; // connect(fd, addr, addrlen)
 
+      case S_save:    x = a; y = b; z = c;                         continue; // save 3 regs
+	  case S_mmap:    p = mmap(x?(void *)mem+x: 0, y, z, a, b, c); 
+                            a = (p==(void *)-1)? -1: p-mem;        continue; // mmap(addr, len, prot, flags, fd, offset)
 //      case S_shutdown:
 //      case S_getsockopt:
 //      case S_setsockopt:

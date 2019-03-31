@@ -29,7 +29,7 @@ enum {
   S_fork=1, S_exit,   S_wait,   S_pipe,   S_write,  S_read,   S_close,  S_kill,
   S_exec,   S_open,   S_mknod,  S_unlink, S_fstat,  S_link,   S_mkdir,  S_chdir,
   S_dup2,   S_getpid, S_sbrk,   S_sleep,  S_uptime, S_lseek,  S_mount,  S_umount,
-  S_socket, S_bind,   S_listen, S_poll,   S_accept, S_connect, 
+  S_socket, S_bind,   S_listen, S_poll,   S_accept, S_connect,S_save,   S_mmap
 };
 
 typedef unsigned char uchar;
